@@ -119,13 +119,13 @@ export default function AboutPage() {
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-900">Meet Our Team</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {[
-              { img: "/abhaysir2.png", name: "Abhay Singh", role: " IT head & Solution architect & Delivery ", bio: "Drives IT strategy and secure operations, architects scalable solutions, and ensures successful, on-time project delivery." },
+              // { img: "/abhaysir2.png", name: "Abhay Singh", role: " IT head & Solution architect & Delivery ", bio: "Drives IT strategy and secure operations, architects scalable solutions, and ensures successful, on-time project delivery." },
               { img: "/sankalp.jpg", name: "Sankalp Shinde", role: "Applications software engineer", bio: "Specialist in cross-platform app development." },
-              { img: "/anant office.jpg", name: "Anant palia", role: "Associate software engineer", bio: "Expert in mobile and app building solutions" },
+              // { img: "/anant office.jpg", name: "Anant palia", role: "Associate software engineer", bio: "Expert in mobile and app building solutions" },
               { img: "/jaydeep.jpg", name: "Jaydeep Sharma", role: "Quality analyst", bio: "Creative leader shaping engaging user experiences." },
               { img: "/vankates2.jpg", name: "Vankatesh kurapati", role: "Marketing Associate", bio: " Recruitment, Operations & Marketing" },
               { img: "/nalni.jpg", name: "Seera nalini", role: "Digital marketing executive", bio: "Drives brand growth through SEO, social media, and online marketing strategies." },
-              { img: "/Alok.jpg", name: "Alok pratihast", role: "Full stack Intern", bio: "Full Stack Developer passionate about building scalable, user-friendly, and efficient web applications from front to back." },
+              { img: "/Alok.jpg", name: "Alok pratihast", role: "Full stack developer", bio: "Full Stack Developer passionate about building scalable, user-friendly, and efficient web applications from front to back." },
               {img:"/kalpana.jpg",name:"Kalpana gaur",role:"Digital marketing executive",bio:"Drives brand growth through SEO, social media, and online marketing strategies."}
             ].map((member) => (
               <div key={member.name} className="bg-white rounded-xl shadow-md hover:shadow-xl text-center p-6 transition-transform hover:scale-105 space-y-2">
