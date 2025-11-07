@@ -22,6 +22,7 @@ const navLinks = [
   { label: "Createemployes", href: "/admindashboard/createadmin", icon: UserPlus },
   { label: "Providerverification", href: "/admindashboard/jobproviders", icon: UserPlus },
   { label: "Postblog", href: "/admindashboard/blogmanagement", icon: FileText },
+  { label: "Invoice", href: "/admindashboard/invoice", icon: FileText },
 ];
 
 export default function AdminSidebar() {
