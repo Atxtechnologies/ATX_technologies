@@ -1,119 +1,10 @@
-// "use client";
-// import { useEffect, useState } from "react";
-// import { fetchInvoices, deleteInvoice } from "./api";
-// import { Invoice } from "./types";
-// import InvoiceFormModal from "./InvoiceFormModal";
-// import InvoiceTemplate from "./InvoiceTemplate";
-
-// export default function InvoiceDashboard() {
-//   const [invoices, setInvoices] = useState<Invoice[]>([]);
-//   const [showModal, setShowModal] = useState(false);
-//   const [editInvoiceId, setEditInvoiceId] = useState<string | null>(null);
-//   const [viewInvoice, setViewInvoice] = useState<Invoice | null>(null);
-
-//   const loadInvoices = async () => {
-//     const data = await fetchInvoices();
-//     setInvoices(data);
-//   };
-
-//   useEffect(() => {
-//     loadInvoices();
-//   }, []);
-
-//   return (
-//     <div className="p-6 bg-gray-50 rounded-lg">
-//       <div className="flex justify-between mb-4">
-//         <h2 className="text-lg font-semibold">Invoices</h2>
-//         <button
-//           onClick={() => {
-//             setEditInvoiceId(null);
-//             setShowModal(true);
-//           }}
-//           className="bg-black text-white px-4 py-2 rounded"
-//         >
-//           + New Invoice
-//         </button>
-//       </div>
-
-//       <table className="w-full border-collapse bg-white rounded shadow-sm">
-//         <thead>
-//           <tr className="bg-gray-100 text-left">
-//             <th className="p-2">Invoice #</th>
-//             <th className="p-2">Client</th>
-//             <th className="p-2">Date</th>
-//             <th className="p-2 text-right">Actions</th>
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {invoices.map((inv) => (
-//             <tr key={inv._id} className="border-b hover:bg-gray-50">
-//               <td className="p-2">{inv.invoiceNumber}</td>
-//               <td className="p-2">{inv.client.name}</td>
-//               <td className="p-2">
-//                 {new Date(inv.invoiceDate).toLocaleDateString()}
-//               </td>
-//               <td className="p-2 text-right">
-//                 <button
-//                   onClick={() => setViewInvoice(inv)}
-//                   className="text-blue-600 hover:underline mr-3"
-//                 >
-//                   View
-//                 </button>
-//                 <button
-//                   onClick={() => {
-//                     setEditInvoiceId(inv._id!);
-//                     setShowModal(true);
-//                   }}
-//                   className="text-green-600 hover:underline mr-3"
-//                 >
-//                   Edit
-//                 </button>
-//                 <button
-//                   onClick={async () => {
-//                     await deleteInvoice(inv._id!);
-//                     loadInvoices();
-//                   }}
-//                   className="text-red-600 hover:underline"
-//                 >
-//                   Delete
-//                 </button>
-//               </td>
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-
-//       {showModal && (
-//         <InvoiceFormModal
-//           invoiceId={editInvoiceId || undefined}
-//           onClose={() => setShowModal(false)}
-//           onSaved={loadInvoices}
-//         />
-//       )}
-
-//       {viewInvoice && (
-//         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-6 z-50">
-//           <div className="relative bg-white p-6 rounded shadow-lg max-h-[90vh] overflow-auto">
-//             <button
-//               onClick={() => setViewInvoice(null)}
-//               className="absolute top-3 right-3 text-gray-600 hover:text-black"
-//             >
-//               ✕
-//             </button>
-//             <InvoiceTemplate invoice={viewInvoice} />
-//           </div>
-//         </div>
-//       )}
-//     </div>
-//   );
-// }
-
 "use client";
 import { useEffect, useState } from "react";
 import { fetchInvoices, deleteInvoice } from "./api";
 import { Invoice } from "./types";
 import InvoiceFormModal from "./InvoiceFormModal";
-import InvoiceTemplate from "./InvoiceTemplate";
+import EditInvoiceModal from "./EditInvoiceModal";
+import StyledInvoiceTemplate from"./InvoiceTemplate";
 
 export default function InvoiceDashboard() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -132,12 +23,12 @@ export default function InvoiceDashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-8">
-      {/* Header Section */}
+      {/* 🧾 Header Section */}
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Invoices</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Invoice Dashboard</h1>
           <p className="text-gray-500 text-sm">
-            Manage and review all your client invoices
+            Manage, review, and download client invoices
           </p>
         </div>
 
@@ -152,7 +43,7 @@ export default function InvoiceDashboard() {
         </button>
       </div>
 
-      {/* Invoices Table */}
+      {/* 📋 Invoices Table */}
       <div className="overflow-hidden bg-white rounded-xl shadow-sm border border-gray-100">
         <table className="w-full border-collapse">
           <thead className="bg-gray-50 border-b border-gray-200">
@@ -160,14 +51,15 @@ export default function InvoiceDashboard() {
               <th className="p-3 font-medium">Invoice #</th>
               <th className="p-3 font-medium">Client</th>
               <th className="p-3 font-medium">Date</th>
+              <th className="p-3 font-medium text-center">Status</th>
               <th className="p-3 font-medium text-right">Actions</th>
             </tr>
           </thead>
           <tbody>
             {invoices.length === 0 ? (
               <tr>
-                <td colSpan={4} className="p-8 text-center text-gray-500">
-                  No invoices found. Click “New Invoice” to create one.
+                <td colSpan={5} className="p-8 text-center text-gray-500">
+                  No invoices yet. Click “New Invoice” to create one.
                 </td>
               </tr>
             ) : (
@@ -179,14 +71,27 @@ export default function InvoiceDashboard() {
                   <td className="p-3 font-medium text-gray-800">
                     {inv.invoiceNumber}
                   </td>
-                  <td className="p-3">{inv.client.name}</td>
+                  <td className="p-3 text-gray-700">{inv.client.name}</td>
                   <td className="p-3 text-gray-600">
                     {new Date(inv.invoiceDate).toLocaleDateString()}
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="p-3 text-center">
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${
+                        inv.status === "paid"
+                          ? "bg-green-100 text-green-700"
+                          : inv.status === "unpaid"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-gray-100 text-gray-700"
+                      }`}
+                    >
+                      {inv.status.charAt(0).toUpperCase() + inv.status.slice(1)}
+                    </span>
+                  </td>
+                  <td className="p-3 text-right space-x-3">
                     <button
                       onClick={() => setViewInvoice(inv)}
-                      className="text-blue-600 hover:text-blue-800 font-medium mr-3 transition-colors"
+                      className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
                     >
                       View
                     </button>
@@ -195,7 +100,7 @@ export default function InvoiceDashboard() {
                         setEditInvoiceId(inv._id!);
                         setShowModal(true);
                       }}
-                      className="text-green-600 hover:text-green-800 font-medium mr-3 transition-colors"
+                      className="text-green-600 hover:text-green-800 font-medium transition-colors"
                     >
                       Edit
                     </button>
@@ -222,16 +127,26 @@ export default function InvoiceDashboard() {
         </table>
       </div>
 
-      {/* Invoice Form Modal */}
+      {/* 🧩 Create / Edit Invoice Modal */}
       {showModal && (
-        <InvoiceFormModal
-          invoiceId={editInvoiceId || undefined}
-          onClose={() => setShowModal(false)}
-          onSaved={loadInvoices}
-        />
+        <>
+          {editInvoiceId ? (
+            <EditInvoiceModal
+              invoiceId={editInvoiceId}
+              onClose={() => setShowModal(false)}
+              onUpdated={loadInvoices}
+            />
+          ) : (
+            <InvoiceFormModal
+              invoiceId={editInvoiceId || undefined}
+              onClose={() => setShowModal(false)}
+              onSaved={loadInvoices}
+            />
+          )}
+        </>
       )}
 
-      {/* View Invoice Modal */}
+      {/* 🧾 View Invoice Modal */}
       {viewInvoice && (
         <div
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 px-4 animate-fadeIn"
@@ -253,9 +168,9 @@ export default function InvoiceDashboard() {
               </button>
             </div>
 
-            {/* Body */}
+            {/* Invoice Template */}
             <div className="overflow-auto p-6 bg-white">
-              <InvoiceTemplate invoice={viewInvoice} />
+              <StyledInvoiceTemplate invoice={viewInvoice} />
             </div>
 
             {/* Footer */}

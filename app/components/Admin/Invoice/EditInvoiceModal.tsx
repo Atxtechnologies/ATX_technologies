@@ -15,7 +15,6 @@ export default function EditInvoiceModal({
   const [form, setForm] = useState<Invoice | null>(null);
 
   useEffect(() => {
-    // Load existing invoice
     const loadInvoice = async () => {
       const inv = await fetchInvoice(invoiceId);
       setForm(inv);
@@ -66,22 +65,25 @@ export default function EditInvoiceModal({
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
       <form
         onSubmit={handleSubmit}
-        className="bg-white w-[600px] p-6 rounded shadow-lg space-y-4 overflow-y-auto max-h-[90vh]"
+        className="bg-white w-[650px] p-6 rounded-2xl shadow-2xl space-y-5 overflow-y-auto max-h-[90vh]"
       >
-        <div className="flex justify-between items-center">
-          <h2 className="text-lg font-semibold">Edit Invoice</h2>
+        {/* Header */}
+        <div className="flex justify-between items-center border-b pb-3">
+          <h2 className="text-xl font-semibold text-gray-800">Edit Invoice</h2>
           <button
             type="button"
             onClick={onClose}
-            className="text-gray-500 hover:text-black"
+            className="text-gray-500 hover:text-black text-lg"
           >
             ✕
           </button>
         </div>
 
-        {/* Company Info */}
-        <div>
-          <h3 className="font-medium mb-2">Company Info</h3>
+        {/* 🏢 Company Info */}
+        <section>
+          <h3 className="font-medium text-gray-700 mb-2 border-b pb-1">
+            Company Info
+          </h3>
           <div className="flex items-center gap-2 mb-3">
             {form.company.logo && (
               <img
@@ -125,7 +127,7 @@ export default function EditInvoiceModal({
           />
           <input
             placeholder="Email"
-            className="border p-2 w-full"
+            className="border p-2 w-full mb-2"
             value={form.company.email}
             onChange={(e) =>
               setForm({
@@ -134,11 +136,97 @@ export default function EditInvoiceModal({
               })
             }
           />
-        </div>
+          <input
+            placeholder="GST Number"
+            className="border p-2 w-full mb-2"
+            value={form.company.gstNumber || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                company: { ...form.company, gstNumber: e.target.value },
+              })
+            }
+          />
 
-        {/* Client Info */}
-        <div>
-          <h3 className="font-medium mb-2">Client Info</h3>
+          {/* 🏦 Bank Details */}
+          <div className="mt-3">
+            <h4 className="font-medium text-gray-700 mb-2">Bank Details</h4>
+            <input
+              placeholder="Bank Name"
+              className="border p-2 w-full mb-2"
+              value={form.company.bankDetails?.bankName || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  company: {
+                    ...form.company,
+                    bankDetails: {
+                      ...form.company.bankDetails,
+                      bankName: e.target.value,
+                    },
+                  },
+                })
+              }
+            />
+            <input
+              placeholder="Account Name"
+              className="border p-2 w-full mb-2"
+              value={form.company.bankDetails?.accountName || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  company: {
+                    ...form.company,
+                    bankDetails: {
+                      ...form.company.bankDetails,
+                      accountName: e.target.value,
+                    },
+                  },
+                })
+              }
+            />
+            <input
+              placeholder="Account Number"
+              className="border p-2 w-full mb-2"
+              value={form.company.bankDetails?.accountNumber || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  company: {
+                    ...form.company,
+                    bankDetails: {
+                      ...form.company.bankDetails,
+                      accountNumber: e.target.value,
+                    },
+                  },
+                })
+              }
+            />
+            <input
+              placeholder="IFSC Code"
+              className="border p-2 w-full"
+              value={form.company.bankDetails?.ifscCode || ""}
+              onChange={(e) =>
+                setForm({
+                  ...form,
+                  company: {
+                    ...form.company,
+                    bankDetails: {
+                      ...form.company.bankDetails,
+                      ifscCode: e.target.value,
+                    },
+                  },
+                })
+              }
+            />
+          </div>
+        </section>
+
+        {/* 👥 Client Info */}
+        <section>
+          <h3 className="font-medium text-gray-700 mb-2 border-b pb-1">
+            Client Info
+          </h3>
           <input
             placeholder="Client Name"
             className="border p-2 w-full mb-2"
@@ -163,7 +251,7 @@ export default function EditInvoiceModal({
           />
           <input
             placeholder="Email"
-            className="border p-2 w-full"
+            className="border p-2 w-full mb-2"
             value={form.client.email}
             onChange={(e) =>
               setForm({
@@ -172,11 +260,24 @@ export default function EditInvoiceModal({
               })
             }
           />
-        </div>
+          <input
+            placeholder="GST Number"
+            className="border p-2 w-full"
+            value={form.client.gstNumber || ""}
+            onChange={(e) =>
+              setForm({
+                ...form,
+                client: { ...form.client, gstNumber: e.target.value },
+              })
+            }
+          />
+        </section>
 
-        {/* Items */}
-        <div>
-          <h3 className="font-medium mb-1">Items</h3>
+        {/* 📦 Items */}
+        <section>
+          <h3 className="font-medium text-gray-700 mb-1 border-b pb-1">
+            Items
+          </h3>
           {form.items.map((it, i) => (
             <div key={i} className="flex gap-2 mb-2">
               <input
@@ -213,28 +314,72 @@ export default function EditInvoiceModal({
           >
             + Add Item
           </button>
-        </div>
+        </section>
 
-        <div className="flex gap-4">
-          <input
-            placeholder="Tax %"
-            className="border p-2 w-24"
-            value={form.taxPercent}
+        {/* 💰 Taxes & Payment */}
+        <section>
+          <h3 className="font-medium text-gray-700 mb-2 border-b pb-1">
+            Taxes & Payment
+          </h3>
+          <div className="grid grid-cols-3 gap-3 mb-3">
+            <input
+              placeholder="GAT %"
+              type="number"
+              className="border p-2 rounded"
+              value={form.gatTaxPercent || 0}
+              onChange={(e) =>
+                setForm({ ...form, gatTaxPercent: Number(e.target.value) })
+              }
+            />
+            <input
+              placeholder="Sales Tax %"
+              type="number"
+              className="border p-2 rounded"
+              value={form.salesTaxPercent || 0}
+              onChange={(e) =>
+                setForm({ ...form, salesTaxPercent: Number(e.target.value) })
+              }
+            />
+            <input
+              placeholder="Other Tax %"
+              type="number"
+              className="border p-2 rounded"
+              value={form.taxPercent || 0}
+              onChange={(e) =>
+                setForm({ ...form, taxPercent: Number(e.target.value) })
+              }
+            />
+          </div>
+
+          <label className="block text-sm font-medium mb-1">
+            Payment Method
+          </label>
+          <select
+            className="border p-2 w-full rounded mb-3"
+            value={form.paymentMethod || "Bank Transfer"}
             onChange={(e) =>
-              setForm({ ...form, taxPercent: Number(e.target.value) })
+              setForm({ ...form, paymentMethod: e.target.value })
             }
-          />
+          >
+            <option value="Bank Transfer">Bank Transfer</option>
+            <option value="UPI">UPI</option>
+            <option value="Credit Card">Credit Card</option>
+            <option value="Cash">Cash</option>
+            <option value="Cheque">Cheque</option>
+          </select>
+
           <input
             placeholder="Notes"
-            className="border p-2 flex-1"
+            className="border p-2 w-full"
             value={form.notes}
             onChange={(e) => setForm({ ...form, notes: e.target.value })}
           />
-        </div>
+        </section>
 
+        {/* ✅ Submit */}
         <button
           type="submit"
-          className="bg-black text-white px-4 py-2 rounded w-full mt-2"
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded w-full font-medium transition"
         >
           Update Invoice
         </button>
