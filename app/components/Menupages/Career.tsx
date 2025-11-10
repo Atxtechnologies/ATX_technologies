@@ -129,6 +129,7 @@ export default function CareerPage() {
   const handleApplyClick = (job: Job) => {
     if (!currentUser) {
       alert("Please login to apply for jobs.");
+      router.push("/jobseeker/signup");
       return;
     }
     setSelectedJob(job);

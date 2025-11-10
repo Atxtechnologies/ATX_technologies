@@ -7,6 +7,7 @@ import { connectedToDatabase } from "@/lib/db";
 import Admin from "@/models/admin";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
+import { decrypt, encrypt } from "@/lib/encryption";
 
 export async function POST(req: NextRequest) {
   try {
@@ -40,11 +41,13 @@ if (!email.endsWith("@atxtechnologies.com")) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
+    const encryptedPassword = encrypt(password);
 
     const newAdmin = await Admin.create({
       name,
       email,
       password: hashedPassword,
+      encryptedPassword,
       phone: phone?.trim() || "",
       role: "admin",
     });
@@ -62,23 +65,60 @@ if (!email.endsWith("@atxtechnologies.com")) {
 }
 
 
+
 export async function GET(req: NextRequest) {
   try {
     await connectedToDatabase();
     const session = await getServerSession(authOptions);
 
+    // ✅ 1. Only superadmin or admin can access
     if (!session || !["superadmin", "admin"].includes(session.user.role)) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
     }
 
-    const admins = await Admin.find({}, "-password").sort({ createdAt: -1 });
-    return NextResponse.json({ admins }, { status: 200 });
+    // ✅ 2. Fetch all admins including encryptedPassword
+    const adminsFromDB = await Admin.find(
+      {},
+      "name email phone role encryptedPassword createdAt"
+    ).sort({ createdAt: -1 });
 
-  } catch (err) {
-    console.error("Fetching admins error:", err);
+    let admins;
+
+    // ✅ 3. If superadmin, decrypt each encrypted password safely
+    if (session.user.role === "superadmin") {
+      admins = adminsFromDB.map((adminDoc) => {
+        const admin = adminDoc.toObject();
+        try {
+          if (typeof admin.encryptedPassword === "string") {
+            admin.password = decrypt(admin.encryptedPassword); // 👈 decrypt properly
+            admin._pwStatus = "ok";
+          } else {
+            admin.password = undefined;
+            admin._pwStatus = "missing";
+          }
+        } catch (err) {
+          admin.password = undefined;
+          admin._pwStatus = "decrypt-error";
+        }
+        return admin;
+      });
+    } else {
+      // ✅ 4. Regular admins don’t get passwords
+      admins = adminsFromDB.map((adminDoc) => ({
+        ...adminDoc.toObject(),
+        password: undefined,
+      }));
+    }
+
+    // ✅ 5. Return admins safely
+    return NextResponse.json({ admins }, { status: 200 });
+  } catch (err: any) {
+    console.error("Fetching admins error:", err.message || err);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
   }
 }
+
+
 
 export async function DELETE(req: NextRequest) {
   try {
