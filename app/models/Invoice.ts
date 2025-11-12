@@ -6,16 +6,21 @@ const LineItemSchema = new mongoose.Schema({
   rate: { type: Number, required: true, default: 0 },
 });
 
+const TaxSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // e.g. GST, Service Tax
+  percent: { type: Number, required: true, default: 0 },
+});
+
 const InvoiceSchema = new mongoose.Schema({
   invoiceNumber: { type: String, required: true, unique: true },
   invoiceDate: { type: Date, default: Date.now },
 
   company: {
-    name: String,
+    name: { type: String, required: true },
     address: String,
     email: String,
     logo: String,
-    gstNumber: String, // ✅ GST Number
+    gstNumber: String,
     bankDetails: {
       accountName: String,
       accountNumber: String,
@@ -25,17 +30,18 @@ const InvoiceSchema = new mongoose.Schema({
   },
 
   client: {
-    name: String,
+    name: { type: String, required: true },
     address: String,
     email: String,
-    gstNumber: String, // ✅ Client GST Number
+    gstNumber: String,
   },
 
-  items: [LineItemSchema],
+  items: { type: [LineItemSchema], required: true },
 
-  gatTaxPercent: { type: Number, default: 0 }, // ✅ GAT
-  salesTaxPercent: { type: Number, default: 0 }, // ✅ Sales Tax
-  taxPercent: { type: Number, default: 0 }, // existing main tax if needed
+  taxes: [TaxSchema], // 🧾 multiple tax entries
+  subtotal: { type: Number, default: 0 }, // 💰 pre-tax amount
+  taxAmount: { type: Number, default: 0 }, // 💸 total tax value
+  totalAmount: { type: Number, default: 0 }, // 💵 final amount
 
   notes: String,
   paymentMethod: {
@@ -48,4 +54,5 @@ const InvoiceSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
 });
 
-export default mongoose.models.Invoice || mongoose.model("Invoice", InvoiceSchema);
+export default mongoose.models.Invoice ||
+  mongoose.model("Invoice", InvoiceSchema);
